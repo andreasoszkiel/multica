@@ -47,18 +47,18 @@ export function WSProvider({
   storage,
   onToast,
 }: WSProviderProps) {
-  const user = authStore((s) => s.user);
-  const workspace = workspaceStore((s) => s.workspace);
+  const userId = authStore((s) => s.user?.id);
+  const workspaceId = workspaceStore((s) => s.workspace?.id);
   const [wsClient, setWsClient] = useState<WSClient | null>(null);
 
   useEffect(() => {
-    if (!user || !workspace) return;
+    if (!userId || !workspaceId) return;
 
     const token = storage.getItem("multica_token");
     if (!token) return;
 
     const ws = new WSClient(wsUrl, { logger: createLogger("ws") });
-    ws.setAuth(token, workspace.id);
+    ws.setAuth(token, workspaceId);
     setWsClient(ws);
     ws.connect();
 
@@ -66,7 +66,7 @@ export function WSProvider({
       ws.disconnect();
       setWsClient(null);
     };
-  }, [user, workspace, wsUrl, storage]);
+  }, [userId, workspaceId, wsUrl, storage]);
 
   const stores: RealtimeSyncStores = { authStore, workspaceStore };
 
